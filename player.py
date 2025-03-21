@@ -72,42 +72,6 @@ class Player(CircleShape):
             c = pygame.Vector2(30 + offset, 30) - forward * PLAYER_RADIUS + right
             pygame.draw.polygon(screen, (255, 255, 255), [a, b, c], 2)
 
-    def game_over(self, screen, main):
-        font = pygame.font.Font(None, 74)
-        small_font = pygame.font.Font(None, 50)
-        options = ["NEW GAME", "EXIT"]
-        selected_option = 0
-
-        clock = pygame.time.Clock()
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_w:
-                        selected_option = (selected_option + 1) % len(options)
-                    elif event.key == pygame.K_s:
-                        selected_option = (selected_option - 1) % len(options)
-                    elif event.key == pygame.K_SPACE:
-                        if selected_option == 0:
-                            main() # Restart game
-                            return
-                        elif selected_option == 1:
-                            pygame.quit()
-                            return
-
-            screen.fill((0, 0, 0))
-            game_over_text = font.render("GAME OVER", True, (255, 0, 0))
-            screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
-
-            for i, option in enumerate(options):
-                color = (255, 255, 255) if i == selected_option else (100, 100, 100)
-                option_text = small_font.render(option, True, color)
-                screen.blit(option_text, (SCREEN_WIDTH // 2 - option_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50 * i))
-
-            pygame.display.flip()
-            clock.tick(60) / 1000
 
 
 
