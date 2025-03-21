@@ -4,7 +4,7 @@ Current version 1.1.2
 
 Things to implement:
 
--Add a scoring system (WIP https://github.com/Inferlopec/asteroids/tree/scoring-system)
+-Add a scoring system (DONE!)
 
 -Implement multiple lives and respawning (DONE!)
 
