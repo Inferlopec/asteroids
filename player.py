@@ -10,7 +10,10 @@ class Player(CircleShape):
         self.rotation = 0
         self.timer = 0  # Shot cooldown timer
         self.lives = 3 # Number of lives
-        self.invincible_timer = 0  # Invincibility timer
+        self.invincible_timer = PLAYER_INVINCIBILITY_TIME  # Invincibility timer
+        self.moving_backwards = False #Flag to check if player is moving backwards
+
+
 
     # Represent player as triangle
     def triangle(self):
@@ -25,25 +28,39 @@ class Player(CircleShape):
         color = (255, 0, 0) if self.invincible_timer > 0 else (255, 255, 255)
         pygame.draw.polygon(screen, color, self.triangle(), 2)
 
-    def rotate(self, dt):
-        self.rotation += PLAYER_TURN_SPEED * dt
+    # Rotation amount in degrees
+    def rotate(self, amount):
+        self.rotation += amount
+
 
     def update(self, dt):
-        keys = pygame.key.get_pressed()
+        self.moving_backwards = False # Reset moving backwards flag every frame
+        
+        keys = pygame.key.get_pressed() 
+
+        if keys[pygame.K_s]: # Check if player is moving backwards and set flag
+            self.moving_backwards = True
+            self.move(-dt)
+
+        # Invert rotation direction if moving backwards
+        rotation_direction = -1 if self.moving_backwards else 1
+        # Calculate rotation amount
+        rotation_amount = PLAYER_TURN_SPEED * dt
+
         if keys[pygame.K_d]:
-            self.rotate(dt)
+            self.rotate(rotation_amount * rotation_direction)
         if keys[pygame.K_a]:
-            self.rotate(-dt)
+            self.rotate(-rotation_amount * rotation_direction)
         if keys[pygame.K_w]:
             self.move(dt)
-        if keys[pygame.K_s]:
-            self.move(-dt)
         if keys[pygame.K_SPACE] and self.timer <= 0:
             self.shoot()
         if self.timer > 0:
             self.timer -= dt
         if self.invincible_timer > 0:
             self.invincible_timer -= dt
+
+        
     
     def move(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -59,18 +76,8 @@ class Player(CircleShape):
         self.velocity = pygame.Vector2(0, 0)
         self.rotation = 0
         self.timer = 0
-        self.invincible_timer = 3 # set invincibility timer
+        self.invincible_timer = PLAYER_INVINCIBILITY_TIME
 
-
-    def draw_lives(self, screen):
-        for i in range(self.lives):
-            offset = 30 * i
-            forward = pygame.Vector2(0, 1).rotate(0)
-            right = pygame.Vector2(0, 1).rotate(90) * PLAYER_RADIUS / 1.5
-            a = pygame.Vector2(30 + offset, 30) + forward * PLAYER_RADIUS
-            b = pygame.Vector2(30 + offset, 30) - forward * PLAYER_RADIUS - right
-            c = pygame.Vector2(30 + offset, 30) - forward * PLAYER_RADIUS + right
-            pygame.draw.polygon(screen, (255, 255, 255), [a, b, c], 2)
 
 
 
