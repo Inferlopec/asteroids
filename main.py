@@ -25,7 +25,6 @@ def game_session():
     # Game objects
     hud = HUD()
     clock = pygame.time.Clock()
-    restart = False
     
     # Sprite groups
     updatable = pygame.sprite.Group()
