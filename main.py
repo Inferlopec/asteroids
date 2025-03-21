@@ -30,10 +30,11 @@ def main():
 
     dt = 0
 
+    #main game loop
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
+                pygame.quit() 
                 return
         screen.fill((0, 0, 0))
         
@@ -41,11 +42,21 @@ def main():
         updatable.update(dt)
         for obj in drawable:
             obj.draw(screen)
+
+        # Draw lives
+        player.draw_lives(screen)
+
+        # Check for collisions
         for asteroid in asteroids:
             if player.collides_with(asteroid):
-                print("Game Over")
-                pygame.quit()
-                return
+               player.lives -= 1
+               if player.lives > 0:
+                   player.respawn()
+               else:
+                   player.game_over(screen, main)
+                   return
+        
+        # Check for collisions between asteroids and shots
         for asteroid in asteroids:
             for shot in shots:
                 if asteroid.collides_with(shot):
