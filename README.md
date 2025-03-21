@@ -6,7 +6,7 @@ Things to implement:
 
 -Add a scoring system
 
--Implement multiple lives and respawning
+-Implement multiple lives and respawning (WIP https://github.com/Inferlopec/asteroids/tree/multiple-lives-and-respawning)
 
 -Add an explosion effect for the asteroids
 
