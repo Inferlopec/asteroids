@@ -98,7 +98,7 @@ class Player(CircleShape):
                             return
 
             screen.fill((0, 0, 0))
-            game_over_text = font.render("GAME OVER", True, (255, 255, 255))
+            game_over_text = font.render("GAME OVER", True, (255, 0, 0))
             screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
 
             for i, option in enumerate(options):
