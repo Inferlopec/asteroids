@@ -10,6 +10,7 @@ class Player(CircleShape):
         self.rotation = 0
         self.timer = 0  # Shot cooldown timer
         self.lives = 3 # Number of lives
+        self.invincible_timer = 0  # Invincibility timer
 
     # Represent player as triangle
     def triangle(self):
@@ -21,7 +22,8 @@ class Player(CircleShape):
         return [a, b, c]
     
     def draw(self, screen):
-        pygame.draw.polygon(screen, (255, 255, 255), self.triangle(), 2)
+        color = (255, 0, 0) if self.invincible_timer > 0 else (255, 255, 255)
+        pygame.draw.polygon(screen, color, self.triangle(), 2)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -40,6 +42,8 @@ class Player(CircleShape):
             self.shoot()
         if self.timer > 0:
             self.timer -= dt
+        if self.invincible_timer > 0:
+            self.invincible_timer -= dt
     
     def move(self, dt):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -55,6 +59,8 @@ class Player(CircleShape):
         self.velocity = pygame.Vector2(0, 0)
         self.rotation = 0
         self.timer = 0
+        self.invincible_timer = 3 # set invincibility timer
+
 
     def draw_lives(self, screen):
         for i in range(self.lives):
@@ -101,7 +107,7 @@ class Player(CircleShape):
                 screen.blit(option_text, (SCREEN_WIDTH // 2 - option_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50 * i))
 
             pygame.display.flip()
-            clock.tick(60)
+            clock.tick(60) / 1000
 
 
 

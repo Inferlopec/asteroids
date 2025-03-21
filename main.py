@@ -22,9 +22,11 @@ def main():
     asteroids = pygame.sprite.Group()
     Asteroid.containers = (asteroids, updatable, drawable)
 
-    AsteroidField.containers = (updatable)
-    asteroid_field = AsteroidField()
 
+    AsteroidField.containers = (updatable,)
+    AsteroidField()
+
+    
     shots = pygame.sprite.Group()
     Shot.containers = (shots, updatable, drawable)
 
@@ -47,14 +49,15 @@ def main():
         player.draw_lives(screen)
 
         # Check for collisions
-        for asteroid in asteroids:
-            if player.collides_with(asteroid):
-               player.lives -= 1
-               if player.lives > 0:
-                   player.respawn()
-               else:
-                   player.game_over(screen, main)
-                   return
+        if player.invincible_timer <= 0:
+            for asteroid in asteroids:
+                if player.collides_with(asteroid):
+                    player.lives -= 1
+                    if player.lives > 0:
+                        player.respawn()
+                    else:
+                        player.game_over(screen, main)
+                        return
         
         # Check for collisions between asteroids and shots
         for asteroid in asteroids:
