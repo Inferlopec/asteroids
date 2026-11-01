@@ -7,12 +7,24 @@ class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
         super().__init__(x, y, radius)
         self.radius = radius
-        
+        # Random lumpy shape: per-vertex radii between 60% and 100% of the base radius
+        self.num_vertices = random.randint(ASTEROID_MIN_VERTICES, ASTEROID_MAX_VERTICES)
+        self.shape = [radius * random.uniform(0.6, 1.0) for _ in range(self.num_vertices)]
+        # Random initial rotation and spin speed
+        self.spin_angle = random.uniform(0, 360)
+        self.spin_speed = random.uniform(ASTEROID_SPIN_MIN, ASTEROID_SPIN_MAX)
+
     def draw(self, screen):
-        pygame.draw.circle(screen, (255, 255, 255), self.position, self.radius, 2)
+        points = []
+        for i, vertex_radius in enumerate(self.shape):
+            angle = self.spin_angle + (i / self.num_vertices) * 360
+            point = self.position + pygame.Vector2(vertex_radius, 0).rotate(angle)
+            points.append(point)
+        pygame.draw.polygon(screen, (255, 255, 255), points, 2)
     
     def update(self, dt):
         self.position += self.velocity * dt
+        self.spin_angle += self.spin_speed * dt
     
     def split(self):
         self.kill()
