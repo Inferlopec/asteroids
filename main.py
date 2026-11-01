@@ -6,6 +6,7 @@ from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 from hud import HUD
+from background import Background
 
 def main():
     """Main game entry point that handles game sessions and restarts"""
@@ -42,6 +43,7 @@ def game_session():
     # Create game objects
     player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
     AsteroidField()
+    background = Background()
     
     # Game loop
     dt = 0
@@ -77,10 +79,12 @@ def game_session():
             continue
         
         # Update game objects
+        background.update(dt)
         updatable.update(dt)
         
         # Draw game
         screen.fill((0, 0, 0))
+        background.draw(screen)
         for obj in drawable:
             obj.draw(screen)
         hud.draw(screen, player)

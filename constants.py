@@ -26,6 +26,9 @@ PLAYER_SHOT_SPEED = 500  # pixels per second
 # Collision properties
 ASTEROID_BOUNCE_FACTOR = 0.5  # How much velocity changes on asteroid collision (0 = no bounce, 1 = full elastic)
 
+# Background properties
+BG_NUM_STARS = 150
+
 # Score values
 SCORE_LARGE = 20   
 SCORE_MEDIUM = 50  

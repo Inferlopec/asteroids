@@ -14,7 +14,7 @@ Things to implement:
 
 -Make the objects wrap around the screen instead of disappearing
 
--Add a background image
+-Add a background image (DONE!)
 
 -Create different weapon types
 
