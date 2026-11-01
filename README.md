@@ -18,7 +18,7 @@ Things to implement:
 
 -Create different weapon types
 
--Make the asteroids lumpy instead of perfectly round
+-Make the asteroids lumpy instead of perfectly round (DONE!)
 
 -Make the ship have a triangular hit box instead of a circular one
 
@@ -27,3 +27,5 @@ Things to implement:
 -Add a speed power-up
 
 -Add bombs that can be dropped
+
+-Add an ESC menu with mission restart and exit game options (DONE!)

@@ -8,6 +8,10 @@ class HUD:
         self.high_score = self.load_high_score()
         self.font_large = pygame.font.Font(None, 36)
         self.font_small = pygame.font.Font(None, 24)
+        # Pre-create overlay surface for pause menu (avoid creating every frame)
+        self.pause_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.pause_overlay.set_alpha(128)
+        self.pause_overlay.fill((0, 0, 0))
     
     def update_score(self, points):
         self.score += points
@@ -70,6 +74,65 @@ class HUD:
             self._draw_game_over_screen(screen, selected, options)
             pygame.display.flip()
             clock.tick(60)
+    
+    def pause_menu(self, screen, drawable, player, hud):
+        """Show pause menu with resume/restart/exit options"""
+        options = ["RESUME", "RESTART", "EXIT"]
+        selected = 0
+        clock = pygame.time.Clock()
+        
+        while True:
+            # Draw game scene (without updating positions)
+            for obj in drawable:
+                obj.draw(screen)
+            # Draw HUD
+            hud.draw(screen, player)
+            
+            # Draw pause overlay on top (using pre-created surface)
+            screen.blit(self.pause_overlay, (0, 0))
+            self._draw_pause_menu_text(screen, selected, options)
+            pygame.display.flip()
+            
+            # Handle events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return "exit"
+                    
+                if event.type == pygame.KEYDOWN:
+                    # Navigate menu
+                    if event.key == pygame.K_w or event.key == pygame.K_UP:
+                        selected = (selected - 1) % len(options)
+                    elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                        selected = (selected + 1) % len(options)
+                    # Select option
+                    elif event.key == pygame.K_SPACE or event.key == pygame.K_RETURN:
+                        if selected == 0:
+                            return "resume"
+                        elif selected == 1:
+                            return "restart"
+                        else:
+                            return "exit"
+                    # ESC closes menu
+                    elif event.key == pygame.K_ESCAPE:
+                        return "resume"
+            
+            clock.tick(60)
+    
+    def _draw_pause_menu_text(self, screen, selected, options):
+        """Draw only the text part of the pause menu"""
+        # Title
+        font_title = pygame.font.Font(None, 74)
+        pause_text = font_title.render("PAUSED", True, (255, 255, 255))
+        text_x = SCREEN_WIDTH // 2 - pause_text.get_width() // 2
+        screen.blit(pause_text, (text_x, SCREEN_HEIGHT // 2 - 150))
+        
+        # Menu options
+        font_menu = pygame.font.Font(None, 50)
+        for i, option in enumerate(options):
+            color = (255, 255, 255) if i == selected else (150, 150, 150)
+            option_text = font_menu.render(option, True, color)
+            text_x = SCREEN_WIDTH // 2 - option_text.get_width() // 2
+            screen.blit(option_text, (text_x, SCREEN_HEIGHT // 2 - 20 + 60 * i))
     
     def _draw_game_over_screen(self, screen, selected, options):
         # Title

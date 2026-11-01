@@ -45,17 +45,41 @@ def game_session():
     # Game loop
     dt = 0
     running = True
+    skip_next_update = False
     while running:
         # Process events
+        should_pause = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False  # Exit game completely
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                should_pause = True
         
-        # Clear screen
-        screen.fill((0, 0, 0))
+        # If ESC pressed, immediately show pause menu (which blocks the game)
+        if should_pause:
+            result = hud.pause_menu(screen, drawable, player, hud)
+            if result == "restart":
+                return True  # Restart game session
+            elif result == "exit":
+                return False  # Exit game
+            # If "resume", skip the next update to avoid time jump
+            skip_next_update = True
+            pygame.display.flip()
+            dt = clock.tick(144) / 1000
+            continue
         
-        # Update and draw game objects
+        # If we just resumed from pause, skip this update
+        if skip_next_update:
+            skip_next_update = False
+            pygame.display.flip()
+            dt = clock.tick(144) / 1000
+            continue
+        
+        # Update game objects
         updatable.update(dt)
+        
+        # Draw game
+        screen.fill((0, 0, 0))
         for obj in drawable:
             obj.draw(screen)
         hud.draw(screen, player)
