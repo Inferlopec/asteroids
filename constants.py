@@ -23,6 +23,9 @@ PLAYER_INVINCIBILITY_TIME = 3.0  # seconds after respawn
 SHOT_RADIUS = 5
 PLAYER_SHOT_SPEED = 500  # pixels per second
 
+# Collision properties
+ASTEROID_BOUNCE_FACTOR = 0.5  # How much velocity changes on asteroid collision (0 = no bounce, 1 = full elastic)
+
 # Score values
 SCORE_LARGE = 20   
 SCORE_MEDIUM = 50  

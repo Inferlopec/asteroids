@@ -29,3 +29,5 @@ Things to implement:
 -Add bombs that can be dropped
 
 -Add an ESC menu with mission restart and exit game options (DONE!)
+
+-Add asteroid-asteroid collision detection (DONE!)

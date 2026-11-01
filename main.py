@@ -1,4 +1,5 @@
 import pygame
+import random
 from constants import *
 from player import Player
 from asteroid import Asteroid
@@ -104,6 +105,29 @@ def game_session():
                     asteroid.split()
                     shot.kill()
                     break
+        
+        # Handle asteroid-asteroid collisions
+        asteroid_list = list(asteroids)
+        for i in range(len(asteroid_list)):
+            for j in range(i + 1, len(asteroid_list)):
+                a1, a2 = asteroid_list[i], asteroid_list[j]
+                if a1.collides_with(a2):
+                    # Calculate direction between centers (handle same position)
+                    direction = a1.position - a2.position
+                    if direction.length() == 0:
+                        # If same position, use random direction
+                        angle = random.uniform(0, 360)
+                        direction = pygame.Vector2(1, 0).rotate(angle)
+                    else:
+                        direction = direction.normalize()
+                    # Separate asteroids so they don't overlap
+                    overlap = (a1.radius + a2.radius) - a1.position.distance_to(a2.position)
+                    a1.position += direction * (overlap / 2)
+                    a2.position -= direction * (overlap / 2)
+                    # Change velocity (bounce)
+                    velocity_change = direction * 20 * ASTEROID_BOUNCE_FACTOR
+                    a1.velocity += velocity_change
+                    a2.velocity -= velocity_change
         
         # Update display
         pygame.display.flip()
