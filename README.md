@@ -1,33 +1,56 @@
 # asteroids
 
-Current version 1.2.0
+A classic Asteroids clone built with Python and pygame. Pilot a triangular ship,
+blast lumpy asteroids into smaller pieces, and survive as long as you can.
 
-Things to implement:
+Current version: 1.3.0
 
--Add a scoring system (DONE!)
+## Features
 
--Implement multiple lives and respawning (DONE!)
+- Scoring system (small asteroids are worth more) with a persistent high score
+- Multiple lives with respawn and a brief invincibility window
+- Lumpy, rotating asteroids that split into two smaller ones when hit
+- Asteroids wrap around the screen edges instead of disappearing
+- Asteroid-asteroid collision with a bounce (speed-capped so they don't accelerate forever)
+- Scrolling starfield background
+- ESC pause menu (resume / restart / exit) with the game scene visible behind it
+- Capped asteroid count so the field stays manageable
 
--Add an explosion effect for the asteroids
+## Setup
 
--Add acceleration to the player movement
+Requires Python 3.10+ and pygame.
 
--Make the objects wrap around the screen instead of disappearing
+```bash
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
--Add a background image (DONE!)
+## Run
 
--Create different weapon types
+```bash
+python main.py
+```
 
--Make the asteroids lumpy instead of perfectly round (DONE!)
+> Note: make sure the virtual environment is activated, otherwise you'll get
+> `ModuleNotFoundError: No module named 'pygame'`.
 
--Make the ship have a triangular hit box instead of a circular one
+## Controls
 
--Add a shield power-up
+| Key | Action |
+| --- | --- |
+| `W` | Thrust forward |
+| `S` | Reverse thrust |
+| `A` / `D` | Rotate left / right (inverted while reversing) |
+| `Space` | Fire |
+| `ESC` | Pause menu (resume / restart / exit) |
 
--Add a speed power-up
+## Roadmap
 
--Add bombs that can be dropped
-
--Add an ESC menu with mission restart and exit game options (DONE!)
-
--Add asteroid-asteroid collision detection (DONE!)
+- Explosion effect for destroyed asteroids
+- Acceleration for player movement
+- Different weapon types
+- Triangular hit box for the ship (instead of circular)
+- Shield power-up
+- Speed power-up
+- Bombs that can be dropped

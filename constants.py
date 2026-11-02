@@ -5,7 +5,8 @@ SCREEN_HEIGHT = 720
 # Asteroid properties
 ASTEROID_MIN_RADIUS = 20
 ASTEROID_KINDS = 3
-ASTEROID_SPAWN_RATE = 0.8  # seconds
+ASTEROID_SPAWN_RATE = 1.2  # seconds
+ASTEROID_MAX_COUNT = 12  # max simultaneous asteroids (they wrap around, so without this the field grows unboundedly)
 ASTEROID_MAX_RADIUS = ASTEROID_MIN_RADIUS * ASTEROID_KINDS
 ASTEROID_MIN_VERTICES = 8
 ASTEROID_MAX_VERTICES = 12
@@ -25,6 +26,7 @@ PLAYER_SHOT_SPEED = 500  # pixels per second
 
 # Collision properties
 ASTEROID_BOUNCE_FACTOR = 0.5  # How much velocity changes on asteroid collision (0 = no bounce, 1 = full elastic)
+ASTEROID_MAX_SPEED = 200  # pixels per second; caps asteroid speed so repeated bounces don't accelerate them unboundedly
 
 # Background properties
 BG_NUM_STARS = 150

@@ -8,6 +8,8 @@ class HUD:
         self.high_score = self.load_high_score()
         self.font_large = pygame.font.Font(None, 36)
         self.font_small = pygame.font.Font(None, 24)
+        self.font_title = pygame.font.Font(None, 74)
+        self.font_menu = pygame.font.Font(None, 50)
         # Pre-create overlay surface for pause menu (avoid creating every frame)
         self.pause_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
         self.pause_overlay.set_alpha(128)
@@ -17,7 +19,6 @@ class HUD:
         self.score += points
         if self.score > self.high_score:
             self.high_score = self.score
-            self.save_high_score()
     
     def draw(self, screen, player):
         # Draw score
@@ -75,7 +76,7 @@ class HUD:
             pygame.display.flip()
             clock.tick(60)
     
-    def pause_menu(self, screen, drawable, player, hud):
+    def pause_menu(self, screen, drawable, player, hud, background):
         """Show pause menu with resume/restart/exit options"""
         options = ["RESUME", "RESTART", "EXIT"]
         selected = 0
@@ -83,6 +84,8 @@ class HUD:
         
         while True:
             # Draw game scene (without updating positions)
+            screen.fill((0, 0, 0))
+            background.draw(screen)
             for obj in drawable:
                 obj.draw(screen)
             # Draw HUD
@@ -121,23 +124,20 @@ class HUD:
     def _draw_pause_menu_text(self, screen, selected, options):
         """Draw only the text part of the pause menu"""
         # Title
-        font_title = pygame.font.Font(None, 74)
-        pause_text = font_title.render("PAUSED", True, (255, 255, 255))
+        pause_text = self.font_title.render("PAUSED", True, (255, 255, 255))
         text_x = SCREEN_WIDTH // 2 - pause_text.get_width() // 2
         screen.blit(pause_text, (text_x, SCREEN_HEIGHT // 2 - 150))
         
         # Menu options
-        font_menu = pygame.font.Font(None, 50)
         for i, option in enumerate(options):
             color = (255, 255, 255) if i == selected else (150, 150, 150)
-            option_text = font_menu.render(option, True, color)
+            option_text = self.font_menu.render(option, True, color)
             text_x = SCREEN_WIDTH // 2 - option_text.get_width() // 2
             screen.blit(option_text, (text_x, SCREEN_HEIGHT // 2 - 20 + 60 * i))
     
     def _draw_game_over_screen(self, screen, selected, options):
         # Title
-        font_title = pygame.font.Font(None, 74)
-        game_over_text = font_title.render("GAME OVER", True, (255, 0, 0))
+        game_over_text = self.font_title.render("GAME OVER", True, (255, 0, 0))
         text_x = SCREEN_WIDTH // 2 - game_over_text.get_width() // 2
         screen.blit(game_over_text, (text_x, SCREEN_HEIGHT // 2 - 150))
         
@@ -152,20 +152,19 @@ class HUD:
         screen.blit(high_score_text, (text_x, SCREEN_HEIGHT // 2 - 40))
         
         # Menu options
-        font_menu = pygame.font.Font(None, 50)
         for i, option in enumerate(options):
             color = (255, 255, 255) if i == selected else (100, 100, 100)
-            option_text = font_menu.render(option, True, color)
+            option_text = self.font_menu.render(option, True, color)
             text_x = SCREEN_WIDTH // 2 - option_text.get_width() // 2
             screen.blit(option_text, (text_x, SCREEN_HEIGHT // 2 + 50 * i))
     
     def calculate_score(self, asteroid_radius):
         if asteroid_radius <= ASTEROID_MIN_RADIUS:
-            return 100  # Small asteroid
+            return SCORE_SMALL   # Small asteroid
         elif asteroid_radius <= ASTEROID_MIN_RADIUS * 2:
-            return 50   # Medium asteroid
+            return SCORE_MEDIUM  # Medium asteroid
         else:
-            return 20   # Large asteroid
+            return SCORE_LARGE   # Large asteroid
     
     def load_high_score(self):
         high_score_file = "high_score.txt"

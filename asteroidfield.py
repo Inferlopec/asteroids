@@ -41,6 +41,12 @@ class AsteroidField(pygame.sprite.Sprite):
         if self.spawn_timer > ASTEROID_SPAWN_RATE:
             self.spawn_timer = 0
 
+            # Don't spawn if the field is already full. Asteroids wrap around the
+            # screen instead of leaving, so without a cap the count would grow
+            # without bound. Asteroid.containers[0] is the dedicated asteroids group.
+            if len(Asteroid.containers[0]) >= ASTEROID_MAX_COUNT:
+                return
+
             # Spawn a new asteroid at a random edge
             edge = random.choice(self.edges)
             speed = random.randint(40, 100)

@@ -12,10 +12,10 @@ def main():
     """Main game entry point that handles game sessions and restarts"""
     pygame.init()
     running = True
-    
+
     while running:
         running = game_session()
-    
+
     pygame.quit()
 
 def game_session():
@@ -54,16 +54,18 @@ def game_session():
         should_pause = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                hud.save_high_score()
                 return False  # Exit game completely
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 should_pause = True
         
         # If ESC pressed, immediately show pause menu (which blocks the game)
         if should_pause:
-            result = hud.pause_menu(screen, drawable, player, hud)
+            result = hud.pause_menu(screen, drawable, player, hud, background)
             if result == "restart":
                 return True  # Restart game session
             elif result == "exit":
+                hud.save_high_score()
                 return False  # Exit game
             # If "resume", skip the next update to avoid time jump
             skip_next_update = True
@@ -98,6 +100,7 @@ def game_session():
                         player.respawn()
                     else:
                         # Game over - return restart choice from HUD
+                        hud.save_high_score()
                         return hud.game_over(screen)
         
         # Handle shot-asteroid collisions
@@ -132,6 +135,11 @@ def game_session():
                     velocity_change = direction * 20 * ASTEROID_BOUNCE_FACTOR
                     a1.velocity += velocity_change
                     a2.velocity -= velocity_change
+                    # Cap speed so repeated bounces don't accelerate asteroids unboundedly
+                    if a1.velocity.length() > ASTEROID_MAX_SPEED:
+                        a1.velocity = a1.velocity.normalize() * ASTEROID_MAX_SPEED
+                    if a2.velocity.length() > ASTEROID_MAX_SPEED:
+                        a2.velocity = a2.velocity.normalize() * ASTEROID_MAX_SPEED
         
         # Update display
         pygame.display.flip()

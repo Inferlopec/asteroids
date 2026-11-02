@@ -12,3 +12,11 @@ class Shot(CircleShape):
     
     def update(self, dt):
         self.position += self.velocity * dt  # Update position
+        # Remove shots that have left the screen so they don't accumulate
+        if (
+            self.position.x < -self.radius
+            or self.position.x > SCREEN_WIDTH + self.radius
+            or self.position.y < -self.radius
+            or self.position.y > SCREEN_HEIGHT + self.radius
+        ):
+            self.kill()
