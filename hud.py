@@ -29,6 +29,15 @@ class HUD:
         high_score_text = self.font_small.render(f"High Score: {self.high_score}", True, (200, 200, 200))
         screen.blit(high_score_text, (10, 40))
         
+        # Draw current weapon
+        weapon_text = self.font_small.render(f"Weapon: {player.weapon.capitalize()}", True, (150, 220, 150))
+        screen.blit(weapon_text, (10, 65))
+        
+        # Draw shield timer while active
+        if player.shield_timer > 0:
+            shield_text = self.font_small.render(f"Shield: {player.shield_timer:.1f}s", True, SHIELD_COLOR)
+            screen.blit(shield_text, (10, 90))
+        
         # Draw lives
         self.draw_lives(screen, player.lives)
     

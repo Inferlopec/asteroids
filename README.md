@@ -3,7 +3,7 @@
 A classic Asteroids clone built with Python and pygame. Pilot an arrow-shaped
 ship, blast lumpy asteroids into smaller pieces, and survive as long as you can.
 
-Current version: 1.4.0
+Current version: 1.6.0
 
 ## Features
 
@@ -11,6 +11,9 @@ Current version: 1.4.0
 - Multiple lives with respawn and a brief invincibility window
 - Lumpy, rotating asteroids that split into two smaller ones when hit
 - Particle explosion effect when asteroids are destroyed (scales with size)
+- Multiple weapons (Blaster, Triple Spread, Piercing Lance) with pickup drops from destroyed asteroids
+- Shield power-up (temporary invincibility with a pulsing bubble) and +1 life restore pickups
+- Reworked projectile visuals (directional tracers + muzzle flash)
 - Arrow-shaped ship with a polygonal hit box (fairer than a circle)
 - Asteroids wrap around the screen edges instead of disappearing
 - Asteroid-asteroid collision with a bounce (speed-capped so they don't accelerate forever)
@@ -50,7 +53,5 @@ python main.py
 ## Roadmap
 
 - Acceleration for player movement
-- Different weapon types
-- Shield power-up
 - Speed power-up
 - Bombs that can be dropped

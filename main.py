@@ -8,6 +8,7 @@ from shot import Shot
 from hud import HUD
 from background import Background
 from particle import Particle
+from pickup import Pickup
 
 def main():
     """Main game entry point that handles game sessions and restarts"""
@@ -34,6 +35,7 @@ def game_session():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    pickups = pygame.sprite.Group()
     
     # Set up containers for sprites
     Player.containers = (updatable, drawable)
@@ -41,6 +43,7 @@ def game_session():
     AsteroidField.containers = (updatable,)
     Shot.containers = (shots, updatable, drawable)
     Particle.containers = (updatable, drawable)
+    Pickup.containers = (pickups, updatable, drawable)
     
     # Create game objects
     player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -93,8 +96,8 @@ def game_session():
             obj.draw(screen)
         hud.draw(screen, player)
         
-        # Handle player-asteroid collisions
-        if player.invincible_timer <= 0:
+        # Handle player-asteroid collisions (blocked while invincible or shielded)
+        if player.invincible_timer <= 0 and player.shield_timer <= 0:
             for asteroid in asteroids:
                 if player.collides_with_asteroid(asteroid):
                     player.lives -= 1
@@ -109,11 +112,33 @@ def game_session():
         for asteroid in asteroids:
             for shot in shots:
                 if asteroid.collides_with(shot):
-                    points = hud.calculate_score(asteroid.radius)
+                    radius = asteroid.radius
+                    points = hud.calculate_score(radius)
                     hud.update_score(points)
                     asteroid.split()
-                    shot.kill()
+                    # Piercing shots survive a hit until their pierce budget runs out
+                    shot.pierce -= 1
+                    if shot.pierce <= 0:
+                        shot.kill()
+                    # Fully-destroyed (small) asteroids can drop pickups.
+                    # Each kind rolls its own rate and on-screen cap.
+                    if radius <= ASTEROID_MIN_RADIUS:
+                        for kind, cfg in PICKUP_DROPS.items():
+                            on_screen = sum(1 for pk in pickups if pk.kind == kind)
+                            if on_screen >= cfg["max_count"]:
+                                continue
+                            # Life pickups are useless at max lives
+                            if kind == "life" and player.lives >= PLAYER_MAX_LIVES:
+                                continue
+                            if random.random() < cfg["rate"]:
+                                Pickup.spawn(kind, asteroid.position.x, asteroid.position.y)
                     break
+        
+        # Handle pickup-player collisions
+        for pickup in pickups:
+            if player.collides_with(pickup):
+                pickup.apply(player)
+                pickup.kill()
         
         # Handle asteroid-asteroid collisions
         asteroid_list = list(asteroids)

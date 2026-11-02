@@ -1,7 +1,9 @@
 import pygame
+import random
 from circleshape import CircleShape
 from constants import *
-from shot import Shot
+from shot import Shot, WEAPONS
+from particle import Particle
 
 # Player class for the game
 class Player(CircleShape):
@@ -12,6 +14,8 @@ class Player(CircleShape):
         self.lives = 3 # Number of lives
         self.invincible_timer = PLAYER_INVINCIBILITY_TIME  # Invincibility timer
         self.moving_backwards = False #Flag to check if player is moving backwards
+        self.weapon = "blaster"  # Currently equipped weapon (key into WEAPONS)
+        self.shield_timer = 0  # Seconds of shield invincibility remaining
 
 
 
@@ -75,6 +79,15 @@ class Player(CircleShape):
         pygame.draw.polygon(screen, (0, 0, 0), points)  # fill to occlude stars
         color = (255, 0, 0) if self.invincible_timer > 0 else (255, 255, 255)
         pygame.draw.polygon(screen, color, points, 2)
+        # Pulsing shield bubble while the shield power-up is active
+        if self.shield_timer > 0:
+            pulse = (pygame.time.get_ticks() / 300) % (2 * 3.14159)
+            wave = (pygame.math.Vector2(1, 0).rotate(pulse * 180 / 3.14159).x + 1) / 2  # 0..1
+            shield_radius = self.radius + 12 + 4 * wave
+            alpha = int(90 + 60 * wave)
+            bubble = pygame.Surface((int(shield_radius * 2) + 4, int(shield_radius * 2) + 4), pygame.SRCALPHA)
+            pygame.draw.circle(bubble, (*SHIELD_COLOR, alpha), (int(shield_radius) + 2, int(shield_radius) + 2), int(shield_radius), 2)
+            screen.blit(bubble, bubble.get_rect(center=(int(self.position.x), int(self.position.y))))
 
     # Rotation amount in degrees
     def rotate(self, amount):
@@ -107,6 +120,8 @@ class Player(CircleShape):
             self.timer -= dt
         if self.invincible_timer > 0:
             self.invincible_timer -= dt
+        if self.shield_timer > 0:
+            self.shield_timer -= dt
 
         
     
@@ -115,9 +130,24 @@ class Player(CircleShape):
         self.position += forward * PLAYER_SPEED * dt
 
     def shoot(self):
-        velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOT_SPEED
-        Shot(self.position.x, self.position.y, velocity)  # Create shot with velocity
-        self.timer = PLAYER_SHOOT_COOLDOWN  # Reset cooldown timer
+        cfg = WEAPONS[self.weapon]
+        forward = pygame.Vector2(0, 1).rotate(self.rotation)
+        # Spawn projectiles from the nose of the ship, not its center
+        origin = self.position + forward * self.radius
+        count = cfg["shots"]
+        for i in range(count):
+            # Fan the shots across the weapon's spread angle (0 for single shots)
+            if count > 1:
+                offset = cfg["spread_deg"] * (i / (count - 1) - 0.5)
+            else:
+                offset = 0
+            velocity = forward.rotate(offset) * cfg["speed"]
+            Shot(origin.x, origin.y, velocity, cfg["radius"], cfg["color"], cfg["pierce"])
+        # Small muzzle flash at the nose
+        for _ in range(2):
+            flash_vel = forward.rotate(random.uniform(-30, 30)) * random.uniform(40, 90)
+            Particle(origin.x, origin.y, random.uniform(2, 4), flash_vel, 0.12, cfg["color"])
+        self.timer = cfg["cooldown"]  # Reset cooldown timer
 
     def respawn(self):
         self.position = pygame.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -125,6 +155,8 @@ class Player(CircleShape):
         self.rotation = 0
         self.timer = 0
         self.invincible_timer = PLAYER_INVINCIBILITY_TIME
+        self.weapon = "blaster"  # Reset to default weapon on death
+        self.shield_timer = 0  # Shield does not carry over death
 
 
 

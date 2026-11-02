@@ -7,11 +7,12 @@ from constants import *
 class Particle(CircleShape):
     """A short-lived particle that flies outward, shrinks, and disappears."""
 
-    def __init__(self, x, y, radius, velocity, lifetime):
+    def __init__(self, x, y, radius, velocity, lifetime, color=PARTICLE_COLOR):
         super().__init__(x, y, radius)
         self.velocity = velocity
         self.lifetime = lifetime
         self.age = 0.0
+        self.color = color
 
     def update(self, dt):
         self.position += self.velocity * dt
@@ -27,7 +28,7 @@ class Particle(CircleShape):
             return
         pygame.draw.circle(
             screen,
-            PARTICLE_COLOR,
+            self.color,
             (int(self.position.x), int(self.position.y)),
             int(current_radius),
         )

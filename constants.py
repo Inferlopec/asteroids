@@ -46,3 +46,23 @@ PARTICLE_SIZE_MAX = 5     # initial radius in pixels
 PARTICLE_LIFETIME_MIN = 0.4  # seconds
 PARTICLE_LIFETIME_MAX = 0.8  # seconds
 PARTICLE_COLOR = (255, 255, 255)
+
+# Pickup properties
+PICKUP_RADIUS = 14
+PICKUP_LIFETIME = 12  # seconds before a pickup expires
+PICKUP_DRIFT_SPEED = 30  # pixels per second
+# Per-kind drop tuning: chance a destroyed small asteroid drops this kind,
+# and the max number of that kind allowed on screen at once.
+PICKUP_DROPS = {
+    "weapon": {"rate": 0.15, "max_count": 2},
+    "shield": {"rate": 0.10, "max_count": 2},
+    "life":   {"rate": 0.05, "max_count": 1},
+}
+
+# Shield power-up
+SHIELD_DURATION = 8.0  # seconds of invincibility granted
+SHIELD_COLOR = (80, 180, 255)
+
+# Life restore power-up
+PLAYER_MAX_LIVES = 3
+LIFE_PICKUP_COLOR = (255, 80, 80)
