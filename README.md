@@ -47,7 +47,7 @@ python main.py
 | `W` | Thrust forward |
 | `S` | Reverse thrust |
 | `A` / `D` | Rotate left / right (inverted while reversing) |
-| `Space` | Fire |
+| `Space` / Left mouse button | Fire |
 | `ESC` | Pause menu (resume / restart / exit) |
 
 ## Roadmap

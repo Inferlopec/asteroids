@@ -114,7 +114,9 @@ class Player(CircleShape):
             self.rotate(-rotation_amount * rotation_direction)
         if keys[pygame.K_w]:
             self.move(dt)
-        if keys[pygame.K_SPACE] and self.timer <= 0:
+        mouse_buttons = pygame.mouse.get_pressed()
+        firing = keys[pygame.K_SPACE] or mouse_buttons[0]  # Space or left mouse button
+        if firing and self.timer <= 0:
             self.shoot()
         if self.timer > 0:
             self.timer -= dt
