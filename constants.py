@@ -35,3 +35,14 @@ BG_NUM_STARS = 150
 SCORE_LARGE = 20   
 SCORE_MEDIUM = 50  
 SCORE_SMALL = 100
+
+# Particle (explosion) properties
+PARTICLE_COUNT_MIN = 15
+PARTICLE_COUNT_MAX = 40
+PARTICLE_SPEED_MIN = 50   # pixels per second
+PARTICLE_SPEED_MAX = 200  # pixels per second
+PARTICLE_SIZE_MIN = 2     # initial radius in pixels
+PARTICLE_SIZE_MAX = 5     # initial radius in pixels
+PARTICLE_LIFETIME_MIN = 0.4  # seconds
+PARTICLE_LIFETIME_MAX = 0.8  # seconds
+PARTICLE_COLOR = (255, 255, 255)

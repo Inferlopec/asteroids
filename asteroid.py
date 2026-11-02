@@ -2,6 +2,7 @@ import pygame
 import random
 from circleshape import CircleShape
 from constants import *
+from particle import spawn_explosion
 
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
@@ -20,6 +21,7 @@ class Asteroid(CircleShape):
             angle = self.spin_angle + (i / self.num_vertices) * 360
             point = self.position + pygame.Vector2(vertex_radius, 0).rotate(angle)
             points.append(point)
+        pygame.draw.polygon(screen, (0, 0, 0), points)  # fill to occlude stars
         pygame.draw.polygon(screen, (255, 255, 255), points, 2)
     
     def update(self, dt):
@@ -36,8 +38,12 @@ class Asteroid(CircleShape):
             self.position.y = -self.radius
     
     def split(self):
+        pos = self.position.copy()
+        vel = self.velocity.copy()
+        radius = self.radius
         self.kill()
-        if self.radius <= ASTEROID_MIN_RADIUS:
+        spawn_explosion(pos, vel, radius)
+        if radius <= ASTEROID_MIN_RADIUS:
             return
         else:
             random_angle = random.uniform(20, 50)

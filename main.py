@@ -7,6 +7,7 @@ from asteroidfield import AsteroidField
 from shot import Shot
 from hud import HUD
 from background import Background
+from particle import Particle
 
 def main():
     """Main game entry point that handles game sessions and restarts"""
@@ -39,6 +40,7 @@ def game_session():
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable,)
     Shot.containers = (shots, updatable, drawable)
+    Particle.containers = (updatable, drawable)
     
     # Create game objects
     player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -94,7 +96,7 @@ def game_session():
         # Handle player-asteroid collisions
         if player.invincible_timer <= 0:
             for asteroid in asteroids:
-                if player.collides_with(asteroid):
+                if player.collides_with_asteroid(asteroid):
                     player.lives -= 1
                     if player.lives > 0:
                         player.respawn()
