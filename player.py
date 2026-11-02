@@ -122,6 +122,15 @@ class Player(CircleShape):
             self.invincible_timer -= dt
         if self.shield_timer > 0:
             self.shield_timer -= dt
+        # Wrap around the screen edges so the ship reappears on the opposite side
+        if self.position.x < -self.radius:
+            self.position.x = SCREEN_WIDTH + self.radius
+        elif self.position.x > SCREEN_WIDTH + self.radius:
+            self.position.x = -self.radius
+        if self.position.y < -self.radius:
+            self.position.y = SCREEN_HEIGHT + self.radius
+        elif self.position.y > SCREEN_HEIGHT + self.radius:
+            self.position.y = -self.radius
 
         
     
