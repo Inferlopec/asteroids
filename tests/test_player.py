@@ -97,3 +97,43 @@ def test_move_advances_along_forward(player):
     start = player.position.copy()
     player.move(0.1)
     assert player.position.distance_to(start) == pytest.approx(20)  # 200 px/s * 0.1
+
+
+class FakeKeys:
+    """Stand-in for pygame.key.get_pressed() with a chosen set of held keys."""
+    def __init__(self, *pressed):
+        self.pressed = set(pressed)
+
+    def __getitem__(self, key):
+        return key in self.pressed
+
+
+def _set_input(monkeypatch, keys=(), left_mouse=False):
+    monkeypatch.setattr(pygame.key, "get_pressed", lambda: FakeKeys(*keys))
+    monkeypatch.setattr(pygame.mouse, "get_pressed", lambda *a, **k: (left_mouse, False, False))
+
+
+def test_left_mouse_click_fires(player, monkeypatch):
+    _set_input(monkeypatch, left_mouse=True)
+    player.update(0.016)
+    assert len(Shot.containers[0]) == 1
+    assert player.timer > 0
+
+
+def test_space_still_fires(player, monkeypatch):
+    _set_input(monkeypatch, keys=(pygame.K_SPACE,))
+    player.update(0.016)
+    assert len(Shot.containers[0]) == 1
+
+
+def test_no_input_does_not_fire(player, monkeypatch):
+    _set_input(monkeypatch)
+    player.update(0.016)
+    assert len(Shot.containers[0]) == 0
+
+
+def test_mouse_fire_respects_cooldown(player, monkeypatch):
+    _set_input(monkeypatch, left_mouse=True)
+    player.update(0.016)
+    player.update(0.016)
+    assert len(Shot.containers[0]) == 1
