@@ -8,6 +8,8 @@ from constants import (
     SCREEN_WIDTH,
     SHIELD_COLOR,
     SHIELD_DURATION,
+    SPEED_COLOR,
+    SPEED_DURATION,
 )
 from pickup import Pickup
 from player import Player
@@ -37,6 +39,15 @@ def test_shield_pickup_applies_duration(pickups):
     assert p.shield_timer == pytest.approx(SHIELD_DURATION)
     assert pk.color == SHIELD_COLOR
     assert pk.label == "S"
+
+
+def test_speed_pickup_applies_duration(pickups):
+    p = make_player()
+    pk = Pickup(100, 100, "speed")
+    pk.apply(p)
+    assert p.speed_timer == pytest.approx(SPEED_DURATION)
+    assert pk.color == SPEED_COLOR
+    assert pk.label == "F"
 
 
 def test_life_pickup_restores_life(pickups):

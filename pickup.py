@@ -9,6 +9,7 @@ PICKUP_LABELS = {
     "spread": "W",
     "lance": "L",
     "shield": "S",
+    "speed": "F",
 }
 
 
@@ -29,6 +30,9 @@ class Pickup(CircleShape):
         elif kind == "shield":
             self.color = SHIELD_COLOR
             self.label = PICKUP_LABELS["shield"]
+        elif kind == "speed":
+            self.color = SPEED_COLOR
+            self.label = PICKUP_LABELS["speed"]
         elif kind == "life":
             self.color = LIFE_PICKUP_COLOR
             self.label = "+"
@@ -69,8 +73,8 @@ class Pickup(CircleShape):
             pygame.draw.line(screen, self.color, (cx - arm, cy), (cx + arm, cy), 2)
             pygame.draw.line(screen, self.color, (cx, cy - arm), (cx, cy + arm), 2)
             return
-        if self.kind == "shield":
-            # Cyan circle with an "S" label
+        if self.kind in ("shield", "speed"):
+            # Circle with a letter label (shield: "S", speed: "F")
             pygame.draw.circle(screen, self.color, (cx, cy), self.radius, 2)
             label = self.font.render(self.label, True, self.color)
             screen.blit(label, label.get_rect(center=(cx, cy)))
@@ -93,6 +97,8 @@ class Pickup(CircleShape):
             player.weapon = self.weapon
         elif self.kind == "shield":
             player.shield_timer = SHIELD_DURATION
+        elif self.kind == "speed":
+            player.speed_timer = SPEED_DURATION
         elif self.kind == "life":
             player.lives = min(player.lives + 1, PLAYER_MAX_LIVES)
 

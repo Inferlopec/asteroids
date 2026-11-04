@@ -3,7 +3,7 @@
 A classic Asteroids clone built with Python and pygame. Pilot an arrow-shaped
 ship, blast lumpy asteroids into smaller pieces, and survive as long as you can.
 
-Current version: 1.6.0
+Current version: 1.7.0
 
 ## Features
 
@@ -13,6 +13,8 @@ Current version: 1.6.0
 - Particle explosion effect when asteroids are destroyed (scales with size)
 - Multiple weapons (Blaster, Triple Spread, Piercing Lance) with pickup drops from destroyed asteroids
 - Shield power-up (temporary invincibility with a pulsing bubble) and +1 life restore pickups
+- Speed power-up (temporary top-speed boost) and droppable bombs (B key) with a radius explosion
+- Acceleration-based ship movement with drag and a speed cap (boosted while the speed power-up is active)
 - Reworked projectile visuals (directional tracers + muzzle flash)
 - Arrow-shaped ship with a polygonal hit box (fairer than a circle)
 - Asteroids wrap around the screen edges instead of disappearing
@@ -48,10 +50,9 @@ python main.py
 | `S` | Reverse thrust |
 | `A` / `D` | Rotate left / right (inverted while reversing) |
 | `Space` / Left mouse button | Fire |
+| `B` | Drop a bomb (explodes on impact, destroying nearby asteroids) |
 | `ESC` | Pause menu (resume / restart / exit) |
 
 ## Roadmap
 
-- Acceleration for player movement
-- Speed power-up
-- Bombs that can be dropped
+- (none — all roadmap items implemented)

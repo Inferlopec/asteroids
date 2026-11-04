@@ -2,10 +2,16 @@ import pygame
 import pytest
 
 from constants import (
+    BOMB_COUNT,
+    PLAYER_ACCELERATION,
+    PLAYER_MAX_SPEED,
     PLAYER_RADIUS,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
+    SPEED_DURATION,
+    SPEED_MULTIPLIER,
 )
+from bomb import Bomb
 from player import Player
 from shot import Shot
 from particle import Particle
@@ -84,19 +90,58 @@ def test_respawn_resets_state(player):
     player.position = pygame.Vector2(10, 10)
     player.weapon = "lance"
     player.shield_timer = 5
+    player.speed_timer = 5
+    player.bombs = 0
     player.lives = 1
     player.respawn()
     assert player.position == pygame.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
     assert player.weapon == "blaster"
     assert player.shield_timer == 0
+    assert player.speed_timer == 0
+    assert player.bombs == BOMB_COUNT
     assert player.invincible_timer == pytest.approx(3.0)
     assert player.lives == 1  # respawn does not touch lives
 
 
-def test_move_advances_along_forward(player):
-    start = player.position.copy()
+def test_move_accelerates_along_forward(player):
     player.move(0.1)
-    assert player.position.distance_to(start) == pytest.approx(20)  # 200 px/s * 0.1
+    # move() applies acceleration, not direct velocity
+    assert player.velocity.length() == pytest.approx(PLAYER_ACCELERATION * 0.1)
+    assert player.velocity.y == pytest.approx(PLAYER_ACCELERATION * 0.1)
+
+
+def test_update_advances_position_by_velocity(player, monkeypatch):
+    _set_input(monkeypatch)
+    start = player.position.copy()
+    player.velocity = pygame.Vector2(0, 100)
+    player.update(0.1)
+    assert player.position.distance_to(start) == pytest.approx(10)
+
+
+def test_speed_pickup_boosts_max_speed(player, monkeypatch):
+    _set_input(monkeypatch)
+    player.speed_timer = SPEED_DURATION
+    player.velocity = pygame.Vector2(0, 1000)
+    player.update(0.016)
+    assert player.velocity.length() == pytest.approx(PLAYER_MAX_SPEED * SPEED_MULTIPLIER)
+
+
+def test_drop_bomb_spawns_bomb(player):
+    group = pygame.sprite.Group()
+    Bomb.containers = (group,)
+    player.bombs = 1
+    player.drop_bomb()
+    assert len(group) == 1
+    assert player.bombs == 0
+
+
+def test_drop_bomb_noop_when_empty(player):
+    group = pygame.sprite.Group()
+    Bomb.containers = (group,)
+    player.bombs = 0
+    player.drop_bomb()
+    assert len(group) == 0
+    assert player.bombs == 0
 
 
 class FakeKeys:

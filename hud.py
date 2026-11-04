@@ -38,6 +38,15 @@ class HUD:
             shield_text = self.font_small.render(f"Shield: {player.shield_timer:.1f}s", True, SHIELD_COLOR)
             screen.blit(shield_text, (10, 90))
         
+        # Draw speed timer while active
+        if player.speed_timer > 0:
+            speed_text = self.font_small.render(f"Speed: {player.speed_timer:.1f}s", True, SPEED_COLOR)
+            screen.blit(speed_text, (10, 115))
+        
+        # Draw bomb count
+        bomb_text = self.font_small.render(f"Bombs: {player.bombs}", True, BOMB_COLOR)
+        screen.blit(bomb_text, (10, 140))
+        
         # Draw lives
         self.draw_lives(screen, player.lives)
     

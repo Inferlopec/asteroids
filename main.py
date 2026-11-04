@@ -9,6 +9,7 @@ from hud import HUD
 from background import Background
 from particle import Particle
 from pickup import Pickup
+from bomb import Bomb
 
 def main():
     """Main game entry point that handles game sessions and restarts"""
@@ -36,6 +37,7 @@ def game_session():
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
     pickups = pygame.sprite.Group()
+    bombs = pygame.sprite.Group()
     
     # Set up containers for sprites
     Player.containers = (updatable, drawable)
@@ -44,6 +46,7 @@ def game_session():
     Shot.containers = (shots, updatable, drawable)
     Particle.containers = (updatable, drawable)
     Pickup.containers = (pickups, updatable, drawable)
+    Bomb.containers = (bombs, updatable, drawable)
     
     # Create game objects
     player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -139,6 +142,28 @@ def game_session():
             if player.collides_with(pickup):
                 pickup.apply(player)
                 pickup.kill()
+        
+        # Handle bomb-asteroid collisions: the bomb explodes and destroys
+        # every asteroid within BOMB_EXPLOSION_RADIUS
+        for bomb in list(bombs):
+            hit = any(bomb.collides_with(a) for a in asteroids)
+            if not hit:
+                continue
+            bomb.kill()
+            for asteroid in list(asteroids):
+                if asteroid.position.distance_to(bomb.position) <= BOMB_EXPLOSION_RADIUS + asteroid.radius:
+                    points = hud.calculate_score(asteroid.radius)
+                    hud.update_score(points)
+                    asteroid.split()
+                    if asteroid.radius <= ASTEROID_MIN_RADIUS:
+                        for kind, cfg in PICKUP_DROPS.items():
+                            on_screen = sum(1 for pk in pickups if pk.kind == kind)
+                            if on_screen >= cfg["max_count"]:
+                                continue
+                            if kind == "life" and player.lives >= PLAYER_MAX_LIVES:
+                                continue
+                            if random.random() < cfg["rate"]:
+                                Pickup.spawn(kind, asteroid.position.x, asteroid.position.y)
         
         # Handle asteroid-asteroid collisions
         asteroid_list = list(asteroids)

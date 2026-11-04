@@ -4,6 +4,7 @@ from circleshape import CircleShape
 from constants import *
 from shot import Shot, WEAPONS
 from particle import Particle
+from bomb import Bomb
 
 # Player class for the game
 class Player(CircleShape):
@@ -16,6 +17,10 @@ class Player(CircleShape):
         self.moving_backwards = False #Flag to check if player is moving backwards
         self.weapon = "blaster"  # Currently equipped weapon (key into WEAPONS)
         self.shield_timer = 0  # Seconds of shield invincibility remaining
+        self.speed_timer = 0  # Seconds of speed boost remaining
+        self.bombs = BOMB_COUNT  # Bombs available to drop
+        self.thrusting = False  # Whether the thruster is firing this frame
+        self.thrust_timer = 0.0  # Accumulator for spawning thruster particles
 
 
 
@@ -114,16 +119,29 @@ class Player(CircleShape):
             self.rotate(-rotation_amount * rotation_direction)
         if keys[pygame.K_w]:
             self.move(dt)
+        # Integrate velocity, then apply drag and clamp to the (possibly boosted) max speed
+        self.position += self.velocity * dt
+        self.thrusting = keys[pygame.K_w] or keys[pygame.K_s]
+        if not self.thrusting:
+            self.velocity *= max(0.0, 1.0 - PLAYER_DRAG * dt)
+        self._emit_thruster_particles(dt)
+        max_speed = PLAYER_MAX_SPEED * (SPEED_MULTIPLIER if self.speed_timer > 0 else 1.0)
+        if self.velocity.length() > max_speed:
+            self.velocity = self.velocity.normalize() * max_speed
         mouse_buttons = pygame.mouse.get_pressed()
         firing = keys[pygame.K_SPACE] or mouse_buttons[0]  # Space or left mouse button
         if firing and self.timer <= 0:
             self.shoot()
+        if keys[pygame.K_b]:
+            self.drop_bomb()
         if self.timer > 0:
             self.timer -= dt
         if self.invincible_timer > 0:
             self.invincible_timer -= dt
         if self.shield_timer > 0:
             self.shield_timer -= dt
+        if self.speed_timer > 0:
+            self.speed_timer -= dt
         # Wrap around the screen edges so the ship reappears on the opposite side
         if self.position.x < -self.radius:
             self.position.x = SCREEN_WIDTH + self.radius
@@ -137,8 +155,33 @@ class Player(CircleShape):
         
     
     def move(self, dt):
+        """Apply thrust acceleration along the ship's facing direction."""
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        self.position += forward * PLAYER_SPEED * dt
+        self.velocity += forward * PLAYER_ACCELERATION * dt
+
+    def _emit_thruster_particles(self, dt):
+        """Spawn short-lived flame particles behind the ship while thrusting."""
+        if not self.thrusting:
+            return
+        self.thrust_timer += dt
+        # Spawn a particle every 30 ms while the thruster is on
+        while self.thrust_timer >= 0.03:
+            self.thrust_timer -= 0.03
+            forward = pygame.Vector2(0, 1).rotate(self.rotation)
+            right = pygame.Vector2(0, 1).rotate(self.rotation + 90)
+            # Emit from the tail, biased slightly to one side
+            origin = self.position - forward * self.radius * 0.5 + right * random.uniform(-0.2, 0.2) * self.radius
+            # Flame shoots backwards, with a little spread and the ship's momentum
+            flame_vel = -forward * random.uniform(80, 160) + right * random.uniform(-25, 25) + self.velocity * 0.5
+            color = random.choice([(255, 180, 60), (255, 120, 40), (255, 220, 120)])
+            Particle(origin.x, origin.y, random.uniform(2, 4), flame_vel, random.uniform(0.15, 0.3), color)
+
+    def drop_bomb(self):
+        """Drop a bomb at the ship's position; it drifts and explodes on impact."""
+        if self.bombs <= 0:
+            return
+        self.bombs -= 1
+        Bomb(self.position.x, self.position.y)
 
     def shoot(self):
         cfg = WEAPONS[self.weapon]
@@ -153,7 +196,7 @@ class Player(CircleShape):
             else:
                 offset = 0
             velocity = forward.rotate(offset) * cfg["speed"]
-            Shot(origin.x, origin.y, velocity, cfg["radius"], cfg["color"], cfg["pierce"])
+            Shot(origin.x, origin.y, velocity, cfg["radius"], cfg["color"], cfg["pierce"], cfg.get("laser", False))
         # Small muzzle flash at the nose
         for _ in range(2):
             flash_vel = forward.rotate(random.uniform(-30, 30)) * random.uniform(40, 90)
@@ -168,6 +211,10 @@ class Player(CircleShape):
         self.invincible_timer = PLAYER_INVINCIBILITY_TIME
         self.weapon = "blaster"  # Reset to default weapon on death
         self.shield_timer = 0  # Shield does not carry over death
+        self.speed_timer = 0  # Speed boost does not carry over death
+        self.bombs = BOMB_COUNT  # Refill bombs on respawn
+        self.thrusting = False
+        self.thrust_timer = 0.0
 
 
 
